@@ -1,0 +1,59 @@
+name: Up-to-date Develop Branch
+
+on:
+  workflow_call:
+    inputs:
+      mainBranch:
+        description: 'Main branch name'
+        type: string
+        default: main
+      devBranch:
+        description: 'Develop branch name'
+        type: string
+        default: develop
+
+permissions: write-all
+
+jobs:
+  post-release:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+      BASE_BRANCH: ${{ inputs.devBranch }}
+      MAIN_BRANCH: ${{ inputs.mainBranch }}
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.MAIN_BRANCH }}
+
+      - name: Setup Github Token
+        uses: fregante/setup-git-token@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Version from Branch Name
+        run: |
+          echo "PACKAGE_VERSION=$(echo ${{ env.HEAD_BRANCH }} | cut -d / -f 2)" >> $GITHUB_ENV
+
+      - name: Create Tag
+        run: |
+          git tag -a -m "$PACKAGE_VERSION" $PACKAGE_VERSION $MAIN_BRANCH
+          git push origin $PACKAGE_VERSION
+
+      - name: Create PR from ${{ env.HEAD_BRANCH }} into ${{ env.BASE_BRANCH }} and Merge
+        env:
+          TITLE: Merge '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}
+          BODY: |
+            Merge tag '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}.
+
+            > This PR was created automatically for up-to-date develop branch and will merge immediately.
+        run: |
+          gh pr create --head $MAIN_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
+          gh pr merge $MAIN_BRANCH --merge
+
+      - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
+        run: git push origin --delete $HEAD_BRANCH
