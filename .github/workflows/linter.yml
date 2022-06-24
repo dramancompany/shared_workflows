@@ -55,4 +55,4 @@ jobs:
           eslint_extensions: ${{ inputs.eslintExtensions }}
 
       - name: TSC
-        uses: icrawl/action-tsc@v1
+        run: npx tsc
