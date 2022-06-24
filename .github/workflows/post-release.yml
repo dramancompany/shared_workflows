@@ -19,6 +19,10 @@ on:
         description: 'Jira version prefix'
         type: string
         required: true
+      jiraIssueDoneStatusName:
+        description: 'Jira issue status name that represents `Done` status'
+        type: string
+        default: 'Done'
       jiraShouldRelease:
         description: 'Whether release jira version'
         type: boolean
@@ -77,7 +81,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: JIRA release
-        uses: kwanwooi25/jira-release@v0.2
+        uses: kwanwooi25/jira-release@v0.3
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           jiraHost: ${{ secrets.JIRA_HOST }}
@@ -87,4 +91,5 @@ jobs:
           jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
           jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
           jiraIssueKeys: ${{ steps.issue-numbers.outputs.issueNumbers }}
+          jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
           shouldRelease: ${{ inputs.jiraShouldRelease }}
