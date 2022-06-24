@@ -76,7 +76,7 @@ jobs:
 
       - name: Extract issue numbers
         id: issue-numbers
-        uses: kwanwooi25/extract-issue-numbers@v0.2
+        uses: kwanwooi25/extract-issue-numbers@v0.3
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
