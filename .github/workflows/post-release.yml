@@ -81,7 +81,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: JIRA release
-        uses: kwanwooi25/jira-release@v0.3
+        uses: kwanwooi25/jira-release@v0.4
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           jiraHost: ${{ secrets.JIRA_HOST }}
