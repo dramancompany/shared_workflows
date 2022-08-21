@@ -74,14 +74,8 @@ jobs:
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
         run: git push origin --delete $HEAD_BRANCH
 
-      - name: Extract issue numbers
-        id: issue-numbers
-        uses: kwanwooi25/extract-issue-numbers@v0.3
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
       - name: JIRA release
-        uses: kwanwooi25/jira-release@v0.5
+        uses: kwanwooi25/jira-release@v0.6
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           jiraHost: ${{ secrets.JIRA_HOST }}
@@ -90,6 +84,5 @@ jobs:
           jiraProjectKey: ${{ inputs.jiraProjectKey }}
           jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
           jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
-          jiraIssueKeys: ${{ steps.issue-numbers.outputs.issueNumbers }}
           jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
           shouldRelease: ${{ inputs.jiraShouldRelease }}
