@@ -7,6 +7,10 @@ on:
         description: 'Whether update package.json version'
         type: boolean
         default: true
+      packageJsonDirectory:
+        description: 'package.json directory to extract current version'
+        type: string
+        default: './'
       bumpLevel:
         description: 'How to bump package version'
         type: string
@@ -47,6 +51,7 @@ jobs:
 
       - name: Get Current Version
         if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
         run: node -p -e '`CURRENT_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
 
       - name: Get New Version
@@ -62,6 +67,7 @@ jobs:
 
       - name: Bump Version
         if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
         run: npm version ${{ github.event.inputs.bumpLevel }} --no-commit-hooks
 
       - name: Push Release Branch
