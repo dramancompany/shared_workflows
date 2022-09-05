@@ -19,6 +19,10 @@ on:
         description: 'Whether the workflow run should try to fix automatically'
         type: boolean
         default: false
+      useRememberUI:
+        description: '프로젝트 내부에서 gihub packages remember-ui 사용 여부(토큰 필요)'
+        type: boolean
+        default: true
     secrets:
       NPM_TOKEN:
         required: true
@@ -37,6 +41,7 @@ jobs:
           node-version: ${{ inputs.nodeVersion }}
 
       - name: Set Github Token for @dramancompany/remember-ui
+        if: ${{inputs.useRememberUI}}
         run: |
           npm config set //npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}
           npm config set @dramancompany:registry=https://npm.pkg.github.com/ --location=project
