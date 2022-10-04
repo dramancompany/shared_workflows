@@ -1,38 +1,13 @@
-name: Up-to-date Develop Branch
+name: Gitflow Finish
 
 on:
-  workflow_call:
-    inputs:
-      mainBranch:
-        description: 'Main branch name'
-        type: string
-        default: main
-      devBranch:
-        description: 'Develop branch name'
-        type: string
-        default: develop
-      jiraProjectKey:
-        description: 'Jira project key'
-        type: string
-        required: true
-      jiraVersionPrefix:
-        description: 'Jira version prefix'
-        type: string
-        required: true
-      jiraIssueDoneStatusName:
-        description: 'Jira issue status name that represents `Done` status'
-        type: string
-        default: 'Done'
-      jiraShouldRelease:
-        description: 'Whether release jira version'
-        type: boolean
-        default: true
+  pull_request:
+    types: [closed]
 
 permissions: write-all
 
 jobs:
-  post-release:
-    if: ${{ github.event.pull_request.merged }}
+  create-auto-pr:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +19,8 @@ jobs:
       - name: Checkout Git Repository
         uses: actions/checkout@v2
         with:
-          ref: ${{ env.MAIN_BRANCH }}
+          ref: main
+          fetch-depth: 0
 
       - name: Setup Github Token
         uses: fregante/setup-git-token@v1
@@ -55,11 +31,6 @@ jobs:
         run: |
           echo "PACKAGE_VERSION=$(echo ${{ env.HEAD_BRANCH }} | cut -d / -f 2)" >> $GITHUB_ENV
 
-      - name: Create Tag
-        run: |
-          git tag -a -m "$PACKAGE_VERSION" $PACKAGE_VERSION $MAIN_BRANCH
-          git push origin $PACKAGE_VERSION
-
       - name: Create PR from ${{ env.HEAD_BRANCH }} into ${{ env.BASE_BRANCH }} and Merge
         env:
           TITLE: Merge '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}
@@ -68,21 +39,26 @@ jobs:
 
             > This PR was created automatically for up-to-date develop branch and will merge immediately.
         run: |
-          gh pr create --head $MAIN_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
-          gh pr merge $MAIN_BRANCH --merge
+          gh pr create --head $HEAD_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
+          gh pr merge $HEAD_BRANCH --merge
 
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
         run: git push origin --delete $HEAD_BRANCH
 
+      - name: Create Tag
+        run: |
+          git tag -a -m "$PACKAGE_VERSION" $PACKAGE_VERSION $MAIN_BRANCH
+          git push origin $PACKAGE_VERSION
+
       - name: JIRA release
-        uses: kwanwooi25/jira-release@v0.6
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          jiraHost: ${{ secrets.JIRA_HOST }}
-          jiraEmail: ${{ secrets.JIRA_EMAIL }}
-          jiraApiToken: ${{ secrets.JIRA_API_TOKEN }}
-          jiraProjectKey: ${{ inputs.jiraProjectKey }}
-          jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
-          jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
-          jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
-          shouldRelease: ${{ inputs.jiraShouldRelease }}
+          uses: kwanwooi25/jira-release@v0.6
+          with:
+            githubToken: ${{ secrets.GITHUB_TOKEN }}
+            jiraHost: ${{ secrets.JIRA_HOST }}
+            jiraEmail: ${{ secrets.SERVER_JIRA_EMAIL }}
+            jiraApiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
+            jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
+            jiraProjectKey: ${{ inputs.jiraProjectKey }}
+            jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
+            jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
+            shouldRelease: ${{ inputs.jiraShouldRelease }}
