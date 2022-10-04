@@ -1,8 +1,32 @@
 name: Gitflow Finish
 
 on:
-  pull_request:
-    types: [closed]
+  workflow_call:
+    inputs:
+      mainBranch:
+        description: 'Main branch name'
+        type: string
+        default: main
+      devBranch:
+        description: 'Develop branch name'
+        type: string
+        default: develop
+      jiraProjectKey:
+        description: 'Jira project key'
+        type: string
+        required: true
+      jiraVersionPrefix:
+        description: 'Jira version prefix'
+        type: string
+        required: true
+      jiraIssueDoneStatusName:
+        description: 'Jira issue status name that represents `Done` status'
+        type: string
+        default: 'Done'
+      jiraShouldRelease:
+        description: 'Whether release jira version'
+        type: boolean
+        default: true
 
 permissions: write-all
 
