@@ -51,14 +51,14 @@ jobs:
           git push origin $PACKAGE_VERSION
 
       - name: JIRA release
-          uses: kwanwooi25/jira-release@v0.6
-          with:
-            githubToken: ${{ secrets.GITHUB_TOKEN }}
-            jiraHost: ${{ secrets.JIRA_HOST }}
-            jiraEmail: ${{ secrets.SERVER_JIRA_EMAIL }}
-            jiraApiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
-            jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
-            jiraProjectKey: ${{ inputs.jiraProjectKey }}
-            jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
-            jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
-            shouldRelease: ${{ inputs.jiraShouldRelease }}
+        uses: kwanwooi25/jira-release@v0.6
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          jiraHost: ${{ secrets.JIRA_HOST }}
+          jiraEmail: ${{ secrets.SERVER_JIRA_EMAIL }}
+          jiraApiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
+          jiraProjectKey: ${{ inputs.jiraProjectKey }}
+          jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
+          jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
+          jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
+          shouldRelease: ${{ inputs.jiraShouldRelease }}
