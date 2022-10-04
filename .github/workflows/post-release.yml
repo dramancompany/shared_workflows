@@ -60,11 +60,10 @@ jobs:
           TITLE: Merge '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}
           BODY: |
             Merge tag '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}.
-
             > This PR was created automatically for up-to-date develop branch and will merge immediately.
         run: |
-          gh pr create --head $HEAD_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
-          gh pr merge $HEAD_BRANCH --merge
+          gh pr create --head $MAIN_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
+          gh pr merge $MAIN_BRANCH --merge
 
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
         run: git push origin --delete $HEAD_BRANCH
