@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: ${{ inputs.nodeVersion }}
 
-      - name: @dramancompany 패키지 사용을 위한 Github 토큰 설정
+      - name: '@dramancompany 패키지 사용을 위한 Github 토큰 설정'
         if: ${{inputs.useRememberUI}}
         run: |
           npm config set //npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}
