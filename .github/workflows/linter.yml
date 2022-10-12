@@ -20,7 +20,7 @@ on:
         type: boolean
         default: false
       useRememberUI:
-        description: '프로젝트 내부에서 gihub packages remember-ui 사용 여부(토큰 필요)'
+        description: '프로젝트 내부에서 github packages remember-ui 사용 여부(토큰 필요)'
         type: boolean
         default: true
     secrets:

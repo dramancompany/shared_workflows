@@ -65,6 +65,11 @@ jobs:
       - name: Create Release Branch
         run: git checkout -b release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
 
+      - name: Add empty .git folder if package.json directory is not root
+        if: ${{ inputs.usePackageJson && inputs.packageJsonDirectory != './' }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: mkdir .git
+
       - name: Bump Version
         if: ${{ inputs.usePackageJson }}
         working-directory: ${{ inputs.packageJsonDirectory }}
