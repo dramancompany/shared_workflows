@@ -1,4 +1,4 @@
-name: Assign PR Reviewers
+name: 리뷰어 자동 지정
 
 on:
   workflow_call:

@@ -32,24 +32,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout git repository
+      - name: 체크아웃
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
+      - name: Node.js ${{ inputs.nodeVersion }} 설정
         uses: actions/setup-node@v1
         with:
           node-version: ${{ inputs.nodeVersion }}
 
-      - name: Set Github Token for @dramancompany/remember-ui
+      - name: @dramancompany 패키지 사용을 위한 Github 토큰 설정
         if: ${{inputs.useRememberUI}}
         run: |
           npm config set //npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}
           npm config set @dramancompany:registry=https://npm.pkg.github.com/ --location=project
 
-      - name: Install Node.js dependencies
+      - name: 의존 모듈 설치
         run: yarn
 
-      - name: Run Linters
+      - name: 린트 실행
         uses: wearerequired/lint-action@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,5 +59,5 @@ jobs:
           eslint_args: ${{ inputs.eslintArgs }}
           eslint_extensions: ${{ inputs.eslintExtensions }}
 
-      - name: TSC
+      - name: TSC 실행
         run: npx tsc

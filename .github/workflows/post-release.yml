@@ -1,4 +1,4 @@
-name: Up-to-date Develop Branch
+name: Develop 브랜치 최신화 및 Jira 릴리즈
 
 on:
   workflow_call:
@@ -41,26 +41,26 @@ jobs:
       MAIN_BRANCH: ${{ inputs.mainBranch }}
 
     steps:
-      - name: Checkout Git Repository
+      - name: 체크아웃
         uses: actions/checkout@v2
         with:
           ref: ${{ env.MAIN_BRANCH }}
 
-      - name: Setup Github Token
+      - name: Github 토큰 설정
         uses: fregante/setup-git-token@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Version from Branch Name
+      - name: 브랜치명에서 버전 추출
         run: |
           echo "PACKAGE_VERSION=$(echo ${{ env.HEAD_BRANCH }} | cut -d / -f 2)" >> $GITHUB_ENV
 
-      - name: Create Tag
+      - name: 버전 태그 지정
         run: |
           git tag -a -m "$PACKAGE_VERSION" $PACKAGE_VERSION $MAIN_BRANCH
           git push origin $PACKAGE_VERSION
 
-      - name: Create PR from ${{ env.HEAD_BRANCH }} into ${{ env.BASE_BRANCH }} and Merge
+      - name: PR 생성 후 머지 (${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }})
         env:
           TITLE: Merge '${{ env.PACKAGE_VERSION }}' into ${{ env.BASE_BRANCH }}
           BODY: |
@@ -71,10 +71,10 @@ jobs:
           gh pr create --head $MAIN_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
           gh pr merge $MAIN_BRANCH --merge
 
-      - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
+      - name: 헤드 브랜치 (${{ env.HEAD_BRANCH }}) 삭제
         run: git push origin --delete $HEAD_BRANCH
 
-      - name: JIRA release
+      - name: 관련 Jira 이슈 업데이트 및 버전 릴리즈
         uses: kwanwooi25/jira-release@v0.6
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}

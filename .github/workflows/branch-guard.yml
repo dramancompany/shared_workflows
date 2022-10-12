@@ -1,4 +1,4 @@
-name: Branch Guard
+name: 브랜치 지킴이
 
 on:
   workflow_call:
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Branch Guard
+      - name: 브랜치 지킴이
         uses: kwanwooi25/pr-to-right-branch@v0.2.2
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
