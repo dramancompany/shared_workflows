@@ -1,0 +1,37 @@
+name: Delete Feature Branch
+
+on:
+  workflow_call:
+    inputs:
+      mainBranch:
+        description: 'Main branch name'
+        type: string
+        default: main
+
+
+permissions: write-all
+
+jobs:
+  delete-feature-branch:
+    runs-on: ubuntu-latest
+
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'feature/') }}
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.mainBranch }}
+          fetch-depth: 0
+
+      - name: Setup Github Token
+        uses: fregante/setup-git-token@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
+        run: git push origin --delete $HEAD_BRANCH
