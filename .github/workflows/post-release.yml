@@ -66,6 +66,7 @@ jobs:
           gh pr merge $MAIN_BRANCH --merge
 
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
+        continue-on-error: true
         run: git push origin --delete $HEAD_BRANCH
 
       - name: Create Tag
