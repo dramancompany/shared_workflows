@@ -36,7 +36,7 @@ jobs:
       - name: Setup Github Token
         uses: fregante/setup-git-token@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
 
       - name: Get Latest Tag
         id: previoustag
@@ -59,7 +59,7 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
           HEAD_BRANCH: release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
           BASE_BRANCH: ${{ inputs.mainBranch }}
           TITLE: v${{ inputs.version || steps.get-new-version.outputs.new_version }}

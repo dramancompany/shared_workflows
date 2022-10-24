@@ -34,7 +34,7 @@ jobs:
   create-auto-pr:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
       HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
       BASE_BRANCH: ${{ inputs.devBranch }}
       MAIN_BRANCH: ${{ inputs.mainBranch }}
@@ -49,7 +49,7 @@ jobs:
       - name: Setup Github Token
         uses: fregante/setup-git-token@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
 
       - name: Extract Version from Branch Name
         run: |
@@ -80,7 +80,7 @@ jobs:
         if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
         uses: kwanwooi25/jira-release@v0.6
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
           jiraHost: ${{ secrets.JIRA_HOST }}
           jiraEmail: ${{ secrets.SERVER_JIRA_EMAIL }}
           jiraApiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
