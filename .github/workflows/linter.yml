@@ -23,14 +23,9 @@ on:
         description: '프로젝트 내부에서 github packages remember-ui 사용 여부(토큰 필요)'
         type: boolean
         default: true
-      useWVKit:
-        description: 'wvkit을 설치해야하는 프로젝트인가요?'
-        type: boolean
-        default: false
     secrets:
       NPM_TOKEN:
         required: false
-      DRAMABOT_SSH_KEY:
 
 jobs:
   run-linters:
@@ -51,15 +46,6 @@ jobs:
         run: |
           npm config set //npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}
           npm config set @dramancompany:registry=https://npm.pkg.github.com/ --location=project
-
-      - name: 'wvkit 설치에 필요한 SSH Key 설정'
-        if: ${{ inputs.useWVKit }}
-        env:
-          SSH_KEY: ${{ secrets.DRAMABOT_SSH_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
 
       - name: 의존 모듈 설치
         run: yarn
