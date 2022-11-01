@@ -23,15 +23,13 @@ jobs:
 
     steps:
       - name: Checkout Git Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ inputs.mainBranch }}
           fetch-depth: 0
 
       - name: Setup Github Token
-        uses: fregante/setup-git-token@v1
-        with:
-          token: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
+        uses: fregante/setup-git-user@v1.1.0
 
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
         run: git push origin --delete $HEAD_BRANCH
