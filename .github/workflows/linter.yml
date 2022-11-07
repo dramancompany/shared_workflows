@@ -23,6 +23,10 @@ on:
         description: '프로젝트 내부에서 github packages remember-ui 사용 여부(토큰 필요)'
         type: boolean
         default: true
+      tscCommand:
+        description: '타입 검사에 사용할 명령어 (default: npx tsc)'
+        type: string
+        default: 'npx tsc'
     secrets:
       NPM_TOKEN:
         required: false
@@ -61,4 +65,4 @@ jobs:
           eslint_extensions: ${{ inputs.eslintExtensions }}
 
       - name: TSC 실행
-        run: npx tsc
+        run: ${{ inputs.tscCommand }}
