@@ -72,6 +72,7 @@ jobs:
           gh pr merge $MAIN_BRANCH --merge
 
       - name: 헤드 브랜치 (${{ env.HEAD_BRANCH }}) 삭제
+        continue-on-error: true
         run: git push origin --delete $HEAD_BRANCH
 
       - name: 관련 Jira 이슈 업데이트 및 버전 릴리즈
