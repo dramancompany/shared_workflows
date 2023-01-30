@@ -52,6 +52,14 @@ jobs:
       - name: Create Release Branch
         run: git checkout -b release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
 
+      - name: Update zeus version
+        if: github.repository == vars.PROJECT_NAME_SHOULD_UPDATE_VERSION_FILE
+        run: sed -i "4s/VERSION = '${{ steps.previoustag.outputs.tag }}'/VERSION = '${{ inputs.version || steps.get-new-version.outputs.new_version }}'/g" lib/zeus/version.rb
+
+      - name: Git add, commit zeus version.rb
+        if: github.repository == vars.PROJECT_NAME_SHOULD_UPDATE_VERSION_FILE
+        run: git commit -am "Update zeus version"
+
       - name: Push Release Branch
         run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
 
