@@ -74,16 +74,21 @@ jobs:
           git tag -a -m "$PACKAGE_VERSION" $PACKAGE_VERSION $MAIN_BRANCH
           git push origin $PACKAGE_VERSION
 
-      - name: JIRA release
+      - name: Extract JIRA issue keys
         if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
-        uses: kwanwooi25/jira-release@v0.6
+        id: jira-issue-keys
+        uses: dramancompany/extract-jira-issue-keys@v1.0.0
         with:
-          githubToken: ${{ secrets.DRAMABOT_TOKEN_FOR_GITHUB_ACTIONS }}
-          jiraHost: ${{ secrets.JIRA_HOST }}
-          jiraEmail: ${{ secrets.SERVER_JIRA_EMAIL }}
-          jiraApiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
-          jiraProjectKey: ${{ inputs.jiraProjectKey }}
-          jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
-          jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
-          jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
-          shouldRelease: ${{ inputs.jiraShouldRelease }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update JIRA issues and release project version
+        if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
+        uses: dramancompany/jira-release@v1.0.2
+        with:
+          host: ${{ secrets.JIRA_HOST }}
+          email: ${{ secrets.SERVER_JIRA_EMAIL }}
+          apiToken: ${{ secrets.SERVER_JIRA_API_TOKEN }}
+          issueKeys: ${{ steps.jira-issue-keys.outputs.issueKeys }}
+          projectKey: ${{ inputs.jiraProjectKey }}
+          versionPrefix: ${{ inputs.jiraVersionPrefix }}
+          version: ${{ env.PACKAGE_VERSION }}
