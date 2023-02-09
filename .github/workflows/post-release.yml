@@ -75,15 +75,20 @@ jobs:
         continue-on-error: true
         run: git push origin --delete $HEAD_BRANCH
 
-      - name: 관련 Jira 이슈 업데이트 및 버전 릴리즈
-        uses: kwanwooi25/jira-release@v0.6
+      - name: 관련 Jira 이슈 키 추출
+        id: extract-issue-keys
+        uses: dramancompany/extract-jira-issue-keys@v1.0.0
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          jiraHost: ${{ secrets.JIRA_HOST }}
-          jiraEmail: ${{ secrets.JIRA_EMAIL }}
-          jiraApiToken: ${{ secrets.JIRA_API_TOKEN }}
-          jiraProjectKey: ${{ inputs.jiraProjectKey }}
-          jiraVersionPrefix: ${{ inputs.jiraVersionPrefix }}
-          jiraReleaseVersion: ${{ env.PACKAGE_VERSION }}
-          jiraIssueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
-          shouldRelease: ${{ inputs.jiraShouldRelease }}
+
+      - name: 관련 Jira 이슈 업데이트 및 버전 릴리즈
+        uses: dramancompany/jira-release@v1.0.2
+        with:
+          host: ${{ secrets.JIRA_HOST }}
+          email: ${{ secrets.JIRA_EMAIL }}
+          apiToken: ${{ secrets.JIRA_API_TOKEN }}
+          issueKeys: ${{ steps.extract-issue-keys.outputs.issueKeys }}
+          projectKey: ${{ inputs.jiraProjectKey }}
+          versionPrefix: ${{ inputs.jiraVersionPrefix }}
+          version: ${{ env.PACKAGE_VERSION }}
+          issueDoneStatusName: ${{ inputs.jiraIssueDoneStatusName }}
