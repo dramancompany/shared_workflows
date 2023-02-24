@@ -82,7 +82,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 관련 Jira 이슈 업데이트 및 버전 릴리즈
-        uses: dramancompany/jira-release@v1.0.2
+        uses: dramancompany/jira-release@v1.0.3
         with:
           host: ${{ secrets.JIRA_HOST }}
           email: ${{ secrets.JIRA_EMAIL }}
