@@ -75,7 +75,7 @@ jobs:
 
       - name: Update JIRA issues and release project version
         if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
-        uses: dramancompany/jira-release@v1.0.2
+        uses: dramancompany/jira-release@v1.0.3
         with:
           host: ${{ secrets.JIRA_HOST }}
           email: ${{ secrets.SERVER_JIRA_EMAIL }}
