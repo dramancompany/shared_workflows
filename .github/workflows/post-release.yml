@@ -77,7 +77,7 @@ jobs:
 
       - name: 관련 Jira 이슈 키 추출
         id: extract-issue-keys
-        uses: dramancompany/extract-jira-issue-keys@v1.0.0
+        uses: dramancompany/extract-jira-issue-keys@v1.0.1
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
