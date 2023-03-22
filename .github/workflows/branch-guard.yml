@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: 브랜치 지킴이
-        uses: kwanwooi25/pr-to-right-branch@v0.2.2
+        uses: dramancompany/branch-guard@v1.0.0
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           mainBranch: ${{ inputs.mainBranch }}
