@@ -87,12 +87,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_BRANCH: ${{ inputs.mainBranch }}
           HEAD_BRANCH: hotfix/${{ inputs.version || steps.get-new-version.outputs.new_version }}
-          TITLE: 'Hotfix: v${{ inputs.version || steps.get-new-version.outputs.new_version }}'
-          BODY: '핫픽스 버전: v${{ inputs.version || steps.get-new-version.outputs.new_version }}\n\n> @${{ github.actor }}에 의해 자동 생성된 PR입니다.'
         run: |
           NEW_VERSION=${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          TITLE="Hotfix: v$NEW_VERSION"
+          BODY="핫픽스 버전: v$NEW_VERSION\n\n> @${{ github.actor }}에 의해 자동 생성된 PR입니다."
+
           gh pr create \
-            --head $HEAD_BRANCH \
-            --base $BASE_BRANCH \
-            --title $TITLE \
-            --body $BODY \
+            --head "$HEAD_BRANCH" \
+            --base "$BASE_BRANCH" \
+            --title "$TITLE" \
+            --body "$BODY"
