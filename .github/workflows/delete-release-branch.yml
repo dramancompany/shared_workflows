@@ -1,0 +1,16 @@
+name: 핫픽스, 릴리즈 브랜치 삭제
+on:
+  workflow_call:
+
+jobs:
+  delete-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch
+        run: |
+          BRANCH_NAME=${{ github.head_ref }}
+          if [[ "$BRANCH_NAME" == hotfix/* || "$BRANCH_NAME" == release/* ]]; then
+            git push origin --delete $BRANCH_NAME
+          else
+            echo "브랜치 이름이 hotfix/ 또는 release/로 시작하지 않습니다. 브랜치 삭제를 건너뜁니다."
+          fi
