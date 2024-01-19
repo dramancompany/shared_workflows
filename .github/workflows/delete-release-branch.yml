@@ -1,6 +1,10 @@
 name: 핫픽스, 릴리즈 브랜치 삭제
 on:
   workflow_call:
+    inputs:
+      is_merged:
+        required: true
+        type: boolean
 
 jobs:
   delete-release-branch:
@@ -10,6 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Delete branch
+        if: inputs.is_merged == false
         run: |
           BRANCH_NAME=${{ github.head_ref }}
           if [[ "$BRANCH_NAME" == hotfix/* || "$BRANCH_NAME" == release/* ]]; then
