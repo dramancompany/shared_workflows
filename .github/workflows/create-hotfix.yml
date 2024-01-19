@@ -97,3 +97,8 @@ jobs:
             --base "$BASE_BRANCH" \
             --title "$TITLE" \
             --body "$BODY"
+      - name: 브랜치 삭제 (에러 발생 시)
+        if: failure()
+        run: |
+          NEW_VERSION=${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          git push origin --delete hotfix/$NEW_VERSION
