@@ -6,6 +6,9 @@ jobs:
   delete-release-branch:
     runs-on: ubuntu-latest
     steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
       - name: Delete branch
         run: |
           BRANCH_NAME=${{ github.head_ref }}
