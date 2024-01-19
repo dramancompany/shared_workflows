@@ -29,7 +29,7 @@ on:
 permissions: write-all
 
 jobs:
-  create-hotfix-branch:
+  create-hotfix:
     runs-on: ubuntu-latest
     if: ${{ inputs.bumpLevel || inputs.version }}
 
