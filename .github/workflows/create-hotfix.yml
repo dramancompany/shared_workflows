@@ -1,0 +1,96 @@
+name: 핫픽스 브랜치 및 PR 생성
+
+on:
+  workflow_call:
+    inputs:
+      usePackageJson:
+        description: 'Whether update package.json version'
+        type: boolean
+        default: true
+      packageJsonDirectory:
+        description: 'package.json directory to extract current version'
+        type: string
+        default: './'
+      bumpLevel:
+        description: 'How to bump package version'
+        type: string
+      version:
+        description: 'Release version'
+        type: string
+      mainBranch:
+        description: 'Main branch name'
+        type: string
+        default: main
+      devBranch:
+        description: 'Develop branch name'
+        type: string
+        default: develop
+
+permissions: write-all
+
+jobs:
+  create-hotfix-branch:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.bumpLevel || inputs.version }}
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Node.js 20.x 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Github 토큰 설정
+        uses: fregante/setup-git-token@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 현재 버전 가져오기 (package.json 버전 사용하는 경우)
+        if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: node -p -e '`CURRENT_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
+
+      - name: 새로운 버전 가져오기 (package.json 버전 사용하는 경우)
+        id: get-new-version
+        if: ${{ inputs.usePackageJson }}
+        uses: actions-ecosystem/action-bump-semver@v1
+        with:
+          current_version: ${{ env.CURRENT_VERSION }}
+          level: ${{ inputs.bumpLevel }}
+
+      - name: 핫픽스 브랜치 생성
+        run: |
+          NEW_VERSION=${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          git switch -c hotfix/$NEW_VERSION
+
+      - name: package.json 이 속한 폴더가 루트가 아닌 경우, 해당 폴더에 .git 폴더 추가
+        if: ${{ inputs.usePackageJson && inputs.packageJsonDirectory != './' }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: mkdir .git
+
+      - name: package.json 업데이트 (package.json 버전 사용하는 경우)
+        if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: npm version ${{ github.event.inputs.bumpLevel }} --no-commit-hooks
+
+      - name: 핫픽스 브랜치 Origin으로 푸시
+        run: |
+          NEW_VERSION=${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          git push origin hotfix/$NEW_VERSION
+
+      - name: 핫픽스 PR 생성
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_BRANCH: ${{ inputs.mainBranch }}
+          HEAD_BRANCH: hotfix/${{ inputs.version || steps.get-new-version.outputs.new_version }}
+        run: |
+          NEW_VERSION=${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          gh pr create \
+            --head $HEAD_BRANCH \
+            --base $BASE_BRANCH \
+            --title "HOTFIX: v$NEW_VERSION" \
+            --body "핫픽스 버전: $NEW_VERSION\n\n > @${{ github.actor }}에 의해 자동 생성된 PR입니다."
