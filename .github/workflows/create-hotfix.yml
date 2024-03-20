@@ -36,8 +36,6 @@ jobs:
     steps:
       - name: 체크아웃
         uses: actions/checkout@v4
-        with:
-          ref: master
 
       - name: Node.js 20.x 설정
         uses: actions/setup-node@v4
