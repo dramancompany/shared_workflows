@@ -92,6 +92,6 @@ jobs:
           BODY: |
             v${{ inputs.version || steps.get-new-version.outputs.new_version }}
 
-            > 
+            > This release PR is to update [${{ inputs.targetPackage }} packages](https://github.com/dramancompany/rwp/releases/latest) in the newly updated rwp.
             > This PR was created by @${{ github.actor }} with manual trigger.
         run: gh pr create --head $HEAD_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
