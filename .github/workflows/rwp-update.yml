@@ -78,7 +78,13 @@ jobs:
       - name: npm version 명령어를 이용한 rwp package들 버전 업데이트
         if: ${{ inputs.usePackageJson }}
         working-directory: ${{ inputs.packageJsonDirectory }}
-        run: npm install @remember-web/${{ inputs.targetPackage }}@latest --no-commit-hooks
+        # inputs.targetPackage가 all일 경우 모든 패키지 업데이트
+        run: |
+          if [ "${{ inputs.targetPackage }}" = "all" ]; then
+            npm install @remember-web/gnb@latest @remember-web/icon@latest @remember-web/legacy-ui@latest @remember-web/mixin@latest @remember-web/primitive@latest --no-commit-hooks
+          else
+            npm install @remember-web/${{ inputs.targetPackage }}@latest --no-commit-hooks
+          fi
 
       - name: 릴리즈 브랜치 Origin으로 푸시
         run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
