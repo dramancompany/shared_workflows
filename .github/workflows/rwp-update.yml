@@ -1,0 +1,97 @@
+name: RWP 업데이트 PR 생성
+
+on:
+  workflow_call:
+    inputs:
+      usePackageJson:
+        description: "Whether update package.json version"
+        type: boolean
+        default: true
+      packageJsonDirectory:
+        description: "package.json directory to extract current version"
+        type: string
+        default: "./"
+      targetPackage:
+        description: "target update package name"
+        type: string
+      version:
+        description: "Release version"
+        type: string
+      mainBranch:
+        description: "Main branch name"
+        type: string
+        default: main
+      devBranch:
+        description: "Develop branch name"
+        type: string
+        default: develop
+
+permissions: write-all
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.targetPackage || inputs.version }}
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.devBranch }}
+
+      - name: Node.js 16.x 설정
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Github 토큰 설정
+        uses: fregante/setup-git-token@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 현재 버전 가져오기 (package.json 버전 사용하는 경우)
+        if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: node -p -e '`CURRENT_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
+
+      - name: 새로운 버전 가져오기 (package.json 버전 사용하는 경우)
+        id: get-new-version
+        if: ${{ inputs.usePackageJson }}
+        uses: actions-ecosystem/action-bump-semver@v1
+        with:
+          current_version: ${{ env.CURRENT_VERSION }}
+          level: patch
+
+      - name: 릴리즈 브랜치 생성
+        run: git checkout -b release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
+
+      - name: package.json 이 속한 폴더가 루트가 아닌 경우, 해당 폴더에 .git 폴더 추가
+        if: ${{ inputs.usePackageJson && inputs.packageJsonDirectory != './' }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: mkdir .git
+
+      - name: npm version 명령어를 이용한 package.json 버전 업데이트 (package.json 버전 사용하는 경우)
+        if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: npm version patch --no-commit-hooks
+
+      - name: npm version 명령어를 이용한 rwp package들 버전 업데이트
+        if: ${{ inputs.usePackageJson }}
+        working-directory: ${{ inputs.packageJsonDirectory }}
+        run: npm install @remember-web/${{ inputs.targetPackage }}@latest --no-commit-hooks
+
+      - name: 릴리즈 브랜치 Origin으로 푸시
+        run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
+
+      - name: 릴리즈 PR 생성
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          BASE_BRANCH: ${{ inputs.mainBranch }}
+          TITLE: v${{ inputs.version || steps.get-new-version.outputs.new_version }}
+          BODY: |
+            v${{ inputs.version || steps.get-new-version.outputs.new_version }}
+
+            > 
+            > This PR was created by @${{ github.actor }} with manual trigger.
+        run: gh pr create --head $HEAD_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
