@@ -94,7 +94,7 @@ jobs:
           git commit -m "chore: Update rwp package versions"
 
       - name: 릴리즈 브랜치 Origin으로 푸시
-        run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
+        run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }} --no-verify
 
       - name: 릴리즈 PR 생성
         env:
