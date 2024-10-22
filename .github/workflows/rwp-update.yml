@@ -73,10 +73,10 @@ jobs:
         working-directory: ${{ inputs.packageJsonDirectory }}
         run: mkdir .git
 
-      - name: yarn version 명령어를 이용한 package.json 버전 업데이트 (package.json 버전 사용하는 경우)
+      - name: npm version 명령어를 이용한 package.json 버전 업데이트 (package.json 버전 사용하는 경우)
         if: ${{ inputs.usePackageJson }}
         working-directory: ${{ inputs.packageJsonDirectory }}
-        run: yarn version --patch --no-git-tag-version
+        run: npm version ${{ github.event.inputs.bumpLevel }} --no-commit-hooks
 
       - name: yarn을 이용한 rwp package들 버전 업데이트
         if: ${{ inputs.targetPackage }}
