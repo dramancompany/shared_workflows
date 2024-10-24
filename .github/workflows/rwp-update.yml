@@ -25,6 +25,10 @@ on:
         description: "Develop branch name"
         type: string
         default: develop
+      nodeVersion:
+        description: "Node.js version"
+        type: number
+        default: 18
 
 permissions: write-all
 
@@ -39,10 +43,10 @@ jobs:
         with:
           ref: ${{ inputs.devBranch }}
 
-      - name: Node.js 18.x 설정
+      - name: Node.js 설정
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ inputs.nodeVersion }}
 
       - name: yarn 설치
         run: npm install -g yarn
