@@ -100,11 +100,11 @@ jobs:
       - name: 릴리즈 브랜치 Origin으로 푸시
         run: git push origin release/${{ inputs.version || steps.get-new-version.outputs.new_version }} --no-verify
 
-      - name: 릴리즈 PR 생성
+      - name: 머지 PR 생성
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_BRANCH: release/${{ inputs.version || steps.get-new-version.outputs.new_version }}
-          BASE_BRANCH: ${{ inputs.mainBranch }}
+          BASE_BRANCH: ${{ inputs.devBranch }}
           TITLE: v${{ inputs.version || steps.get-new-version.outputs.new_version }}
           BODY: |
             v${{ inputs.version || steps.get-new-version.outputs.new_version }}
