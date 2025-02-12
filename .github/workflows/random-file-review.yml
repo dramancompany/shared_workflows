@@ -1,0 +1,61 @@
+name: 'Random File Review'
+
+on:
+  workflow_call:
+    inputs:
+      randomCount:
+        description: '무작위로 선택할 파일 개수'
+        type: number
+        required: false
+        default: '1'
+
+      ignorePatterns:
+        description: '무시할 경로/파일 (쉼표로 구분)'
+        type: string
+        required: false
+        default: '.git,node_modules'
+
+      createIssue:
+        description: '이슈를 생성할지 여부(true/false)'
+        type: string
+        required: false
+        default: 'true'
+
+jobs:
+  random-file-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Select random files
+        id: select-files
+        run: |
+          # inputs 받아오기
+          RANDOM_COUNT="${{ inputs.randomCount }}"
+          IGNORE="${{ inputs.ignorePatterns }}"
+
+          # 쉼표 구분 패턴 분해 (간단 예시)
+          IFS=',' read -ra IGNORE_ARR <<< "$IGNORE"
+
+          # find 로 전체 파일 목록 수집
+          FILES=$(find . -type f)
+          for pattern in "${IGNORE_ARR[@]}"; do
+            FILES=$(echo "$FILES" | grep -v "$pattern")
+          done
+
+          SELECTED=$(echo "$FILES" | shuf -n "$RANDOM_COUNT" | xargs | tr ' ' ',')
+          echo "Selected files => $SELECTED"
+          echo "selected_files=$SELECTED" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Issue
+        if: ${{ inputs.createIssue == 'true' }}
+        uses: actions-ecosystem/action-create-issue@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          title: '랜덤 리뷰 파일: ${{ steps.select-files.outputs.selected_files }}'
+          body: |
+            **무작위로 선정된 파일**: ${{ steps.select-files.outputs.selected_files }}
+
+            댓글로 리뷰나 개선 의견을 남겨주세요!
