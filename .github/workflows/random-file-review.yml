@@ -7,7 +7,7 @@ on:
         description: '무작위로 선택할 파일 개수'
         type: number
         required: false
-        default: '1'
+        default: 1
 
       ignorePatterns:
         description: '무시할 경로/파일 (쉼표로 구분)'
