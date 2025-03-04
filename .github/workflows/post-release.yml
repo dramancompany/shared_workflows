@@ -53,7 +53,7 @@ jobs:
             > This PR was created automatically for up-to-date develop branch and will merge immediately.
         run: |
           gh pr create --head $MAIN_BRANCH --base $BASE_BRANCH --title "$TITLE" --body "$BODY"
-          gh pr merge $MAIN_BRANCH --merge
+          gh pr merge $MAIN_BRANCH --merge --admin
 
       - name: Delete Head Branch (${{ env.HEAD_BRANCH }})
         if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
